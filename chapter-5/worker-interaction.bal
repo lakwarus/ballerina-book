@@ -3,26 +3,26 @@ import ballerina/runtime;
  
 public function main() {
     worker w1 {
-        int i = 100;
-        float k = 2.34;
-        [int, float] t1 = [i, k];
-        t1 -> w2;
-        io:println("[w1 -> w2] i: ", i, " k: ", k);
+        int iw1 = 50;
+        float kw1 = 7.67;
+        [int, float] x1 = [iw1, kw1];
+        x1 -> w2;
+        io:println("[w1 -> w2] iw1: ", iw1, " kw1: ", kw1);
  
-        json j = {};
-        j = <- w2;
-        string jStr = j.toString();
-        io:println("[w1 <- w2] j: ", jStr);
-        io:println("[w1 ->> w2] i: ", i);
+        json jw1 = {};
+        jw1 = <- w2;
+        string jStr = jw1.toString();
+        io:println("[w1 <- w2] jw1: ", jStr);
+        io:println("[w1 ->> w2] iw1: ", iw1);
  
-        () send = i ->> w2;
+        () send = iw1 ->> w2;
 
         io:println("[w1 ->> w2] successful!!");
 
-        io:println("[w1 -> w3] k: ", k);
-        k -> w3;
-        k -> w3;
-        k -> w3;
+        io:println("[w1 -> w3] kw1: ", kw1);
+        kw1 -> w3;
+        kw1 -> w3;
+        kw1 -> w3;
 
         io:println("Waiting for worker w3 to fetch messages..");
 
@@ -31,21 +31,21 @@ public function main() {
     }
  
     worker w2 {
-        int iw;
-        float kw;
+        int iw2;
+        float kw2;
         [int, float] vW1 = [0, 1.0];
         vW1 = <- w1;
-        [iw, kw] = vW1;
-        io:println("[w2 <- w1] iw: ", iw , " kw: ", kw);
+        [iw2, kw2] = vW1;
+        io:println("[w2 <- w1] iw2: ", iw2 , " kw: ", kw2);
 
-        json jw = { "name": "Ballerina" };
-        io:println("[w2 -> w1] jw: ", jw);
-        jw -> w1;
+        json jw2 = { "greet": "Hello World" };
+        io:println("[w2 -> w1] jw2: ", jw2);
+        jw2 -> w1;
 
-        int lw;
+        int lw2;
         runtime:sleep(5);
-        lw = <- w1;
-        io:println("[w2 <- w1] lw: ", lw);
+        lw2 = <- w1;
+        io:println("[w2 <- w1] lw2: ", lw2);
     }
 
     worker w3 {
