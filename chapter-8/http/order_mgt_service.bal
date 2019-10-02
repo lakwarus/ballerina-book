@@ -20,19 +20,22 @@ service orderMgt on httpListener {
         http:Response response = new;
         var orderReq = req.getJsonPayload();
         if (orderReq is json) {
-            string orderId = orderReq.Order.ID.toString();
-            ordersMap[orderId] = orderReq;
-
-            // Create response message.
-            json payload = { status: "Order Created.", orderId: orderId };
-            response.setJsonPayload(<@untainted> payload);
-
-            // Set 201 Created status code in the response message.
-            response.statusCode = 201;
-            // Set 'Location' header in the response message.
-            // This can be used by the client to locate the newly added order.
-            response.setHeader("Location",
-                "http://abc.retail.com:9090/ordermgt/order/" + orderId);
+            json | error idJ = orderReq.Order.ID;
+            if idJ is error {
+                log:printError("Error extracting order ID", err = idJ);
+            } else {
+                string orderId = idJ.toString(); 
+                ordersMap[orderId] = orderReq;
+                // Create response message.
+                json payload = { status: "Order Created.", orderId: orderId };
+                response.setJsonPayload(<@untainted> payload);
+                // Set 201 Created status code in the response message.
+                response.statusCode = 201;
+                // Set 'Location' header in the response message.
+                // This can be used by the client to locate the newly added order.
+                response.setHeader("Location",
+                    "http://abc.retail.com:9090/ordermgt/order/" + orderId);
+            }
         } else {
             response.statusCode = 400;
             response.setPayload("Invalid payload received");
@@ -49,17 +52,14 @@ service orderMgt on httpListener {
         path: "/order/{orderId}"
     }
     resource function getOrder(http:Caller caller, http:Request req, string orderId) {
-       
        // Find the requested order from the map and retrieve it in JSON format.
        json? payload = ordersMap[orderId];
        http:Response response = new;
        if (payload == null) {
            payload = "Order : " + orderId + " cannot be found.";
        }    
-
        // Set the JSON payload in the outgoing response message.
        response.setJsonPayload(<@untainted> payload);
-
       // Send response to the client.
       var result = caller->respond(response);
       if (result is error) {
