@@ -3,7 +3,6 @@ import ballerina/math;
 import ballerina/lang.'float as floats;
 
 public function main() returns error? {
-  int i = 0;
   while true {
     string input = io:readln("Enter a positive number (q to exit): ");
     if input == "q" {
