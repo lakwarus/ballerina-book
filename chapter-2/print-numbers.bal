@@ -1,8 +1,8 @@
 import ballerina/io;
 
 public function main() {
-    int i = 1;
-    while i <= 100 {
+    int i = 0;
+    while i < 100 {
         io:println(i);
         i += 1;
     }
