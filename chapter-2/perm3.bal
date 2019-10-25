@@ -1,7 +1,8 @@
 import ballerina/io;
 
 public function main() {
-    int result1 = perm(4, 2);
+    int a = 5; int b = 10;
+    _ = perm(a, b);
     int result2 = perm(5, 3);
     io:println(result1);
     io:println(result2);
