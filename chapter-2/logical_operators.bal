@@ -8,5 +8,7 @@ public function main() {
    boolean e = a == b || (c < 20 && c > 5);
    boolean f = a < 10;
    boolean g = !f;
-   io:println(d, ":", e, ":", f, ":", g);
+   boolean h = a == c || (c < 20 && c > 5);
+   boolean i = a == b && b > 10;
+   io:println(d, ":", e, ":", f, ":", g, ":", h, ":", i);
 }

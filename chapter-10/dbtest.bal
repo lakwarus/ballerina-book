@@ -54,7 +54,7 @@ public function populateData() {
 }
 
 type Employee record {
-    string id;
+    int id;
     string name;
     string department;
     string telephone;
