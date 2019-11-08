@@ -62,21 +62,21 @@ public function main() {
     decimal|error r1 = am.getAccountBalance("AC1");
     decimal|error r2 = am.getAccountBalance("AC2");
     decimal|error r3 = am.getAccountBalance("AC3");
-    io:println(r1);
-    io:println(r2);
-    io:println(r3);
+    io:println("AC1 Balance: ", r1);
+    io:println("AC2 Balance: ", r2);
+    io:println("AC3 Balance: ", r3);
     error? err = am.debitAccount("AC1", 1000);
     if (err is error) {
-        io:println("Error: ", err);
+        io:println("AC1 Debit Error: ", err);
     }
     err = am.creditAccount("AC2", 1000);
     if (err is error) {
-        io:println("Error: ", err);
+        io:println("AC2 Credit Error: ", err);
     }
-    io:println(am.getAccountBalance("AC1"));
-    io:println(am.getAccountBalance("AC2"));
+    io:println("AC1 Balance: ", am.getAccountBalance("AC1"));
+    io:println("AC2 Balance: ",  am.getAccountBalance("AC2"));
     err = am.debitAccount("AC1", 1000);
     if (err is error) {
-        io:println("Error: ", err);
+        io:println("AC1 Debit Error: ", err);
     }
 }
