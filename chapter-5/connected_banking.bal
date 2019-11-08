@@ -66,6 +66,19 @@ public type AccountManagement object {
 
 };
 
+type OnlineBankingTransferErrorDetail record {|
+    string message?;
+    AccountMgtError cause;
+    string sourceAccount;
+    string targetAccount;
+    decimal amount;
+|};
+
+const OB_TRANSFER_ERROR = "ONLINE_BANKING_TRANSFER_ERROR";
+
+type OnlineBankingTransferError error<OB_TRANSFER_ERROR,
+                                      OnlineBankingTransferErrorDetail>;
+
 type OnlineBanking object {
 
     private AccountManagement accountMgt;
@@ -85,11 +98,15 @@ type OnlineBanking object {
         AccountMgtError? err = self.accountMgt.debitAccount(
                                   sourceAccount, amount);
         if (err is error) {
-            return err;
+            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, amount = amount,
+                         cause = err);
         }
         err = self.accountMgt.creditAccount(targetAccount, amount);
         if (err is error) {
-            return err;
+            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, amount = amount,
+                         cause = err);
         }
     }
 
@@ -97,14 +114,14 @@ type OnlineBanking object {
 
 public function main() {
     AccountManagement actMgmt = new;
-    OnlineBanking onlineBank = new(actMgmt);
-    error? err = onlineBank.transferMoney("AC1", "AC2", 500.0);
+    OnlineBanking olBank = new(actMgmt);
+    error? err = olBank.transferMoney("AC1", "AC2", 500.0);
     if (err is error) {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
-    io:println("AC1 Balance: ", onlineBank.lookupAccountBalance("AC1"));
-    io:println("AC2 Balance: ", onlineBank.lookupAccountBalance("AC2"));
-    err = onlineBank.transferMoney("AC1", "AC2", 1500.0);
+    io:println("AC1 Balance: ", olBank.lookupAccountBalance("AC1"));
+    io:println("AC2 Balance: ", olBank.lookupAccountBalance("AC2"));
+    err = olBank.transferMoney("AC1", "AC2", 1500.0);
     if (err is error) {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
