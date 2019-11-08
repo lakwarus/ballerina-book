@@ -7,19 +7,18 @@ type MyErrorDetail record {|
     string location;
 |};
 
-const MyErrorReason1 = "MyReason1";
-const MyErrorReason2 = "MyReason2";
+const MyErrorReason1 = "MyReason";
+const MyErrorReason2 = "MyReason";
 
-type MyError1 error<MyErrorReason1, MyErrorDetail>;
+type MyError1 error<MyErrorReason1>;
 type MyError2 error<MyErrorReason2>;
 
 public function main() {
     string|error result = myErrorProneFunction();
-    if (result is string) {
-        io:println(result);
-    } else if (result is MyError1) {
+    if (result is MyError1) {
         io:println("Error1: ", result);
-    } else if (result is MyError2) {
+    } 
+    if (result is MyError2) {
         io:println("Error2: ", result);
     }
 }
