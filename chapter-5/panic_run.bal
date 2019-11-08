@@ -11,8 +11,12 @@ type MyErrorDetail record {|
 type MyError error<MyReason, MyErrorDetail>;
 
 public function main() {
-    string result = myErrorProneFunction();
-    io:println(result);
+    string|error res = trap myErrorProneFunction();
+    if (res is error) {
+        io:println("Error: ", res);
+    } else {
+        io:println(res);
+    }
 }
 
 function myErrorProneFunction() returns string {
