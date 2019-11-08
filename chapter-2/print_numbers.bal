@@ -6,4 +6,5 @@ public function main() {
         io:println(i);
         i += 1;
     }
+    io:println("End.");
 }
