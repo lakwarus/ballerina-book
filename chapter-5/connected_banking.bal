@@ -98,15 +98,17 @@ type OnlineBanking object {
         AccountMgtError? err = self.accountMgt.debitAccount(
                                   sourceAccount, amount);
         if (err is error) {
-            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, amount = amount,
-                         cause = err);
+            return error(OB_TRANSFER_ERROR, 
+                         sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, 
+                         amount = amount, cause = err);
         }
         err = self.accountMgt.creditAccount(targetAccount, amount);
         if (err is error) {
-            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, amount = amount,
-                         cause = err);
+            return error(OB_TRANSFER_ERROR, 
+                         sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, 
+                         amount = amount, cause = err);
         }
     }
 
