@@ -4,8 +4,11 @@ import ballerina/time;
 const INVALID_ACCOUNT_NUMBER = "INVALID_ACCOUNT_NUMBER";
 const INSUFFICIENT_ACCOUNT_BALANCE = "INSUFFICIENT_ACCOUNT_BALANCE";
 
-type AccountMgtErrorReason INVALID_ACCOUNT_NUMBER | 
-                           INSUFFICIENT_ACCOUNT_BALANCE;
+type INVALID_ACCOUNT_NUMBER_REASON INVALID_ACCOUNT_NUMBER;
+type INSUFFICIENT_ACCOUNT_BALANCE_REASON INSUFFICIENT_ACCOUNT_BALANCE;
+
+type AccountMgtErrorReason INVALID_ACCOUNT_NUMBER_REASON | 
+                           INSUFFICIENT_ACCOUNT_BALANCE_REASON;
 
 type AccountMgtErrorDetail record {|
     string message?;
@@ -17,12 +20,12 @@ type AccountMgtErrorDetail record {|
 type AccountMgtError error<AccountMgtErrorReason, 
                            AccountMgtErrorDetail>;
 
-public type AccountManagement object {
+public type AccountManager object {
 
     private map<decimal> accounts = { AC1: 1500.0, AC2: 2550.0 };
 
     public function getAccountBalance(string accountNumber) 
-                                      returns decimal|error {
+                                      returns decimal|AccountMgtError {
         decimal? result = self.accounts[accountNumber];
         if (result is decimal) {
             return result;
@@ -81,21 +84,22 @@ type OnlineBankingTransferError error<OB_TRANSFER_ERROR,
 
 type OnlineBanking object {
 
-    private AccountManagement accountMgt;
+    private AccountManager accountMgr;
 
-    public function __init(AccountManagement accountMgt) {
-        self.accountMgt = accountMgt;
+    public function __init(AccountManager accountMgr) {
+        self.accountMgr = accountMgr;
     }
 
     public function lookupAccountBalance(string accountNumber) 
-                                         returns decimal|error {
-        return self.accountMgt.getAccountBalance(accountNumber);
+                                         returns decimal|AccountMgtError {
+        return self.accountMgr.getAccountBalance(accountNumber);
     }
 
     public function transferMoney(string sourceAccount, 
                                   string targetAccount, 
-                                  decimal amount) returns error? {
-        AccountMgtError? err = self.accountMgt.debitAccount(
+                                  decimal amount) 
+                                  returns OnlineBankingTransferError? {
+        AccountMgtError? err = self.accountMgr.debitAccount(
                                   sourceAccount, amount);
         if (err is error) {
             return error(OB_TRANSFER_ERROR, 
@@ -103,7 +107,7 @@ type OnlineBanking object {
                          targetAccount = targetAccount, 
                          amount = amount, cause = err);
         }
-        err = self.accountMgt.creditAccount(targetAccount, amount);
+        err = self.accountMgr.creditAccount(targetAccount, amount);
         if (err is error) {
             return error(OB_TRANSFER_ERROR, 
                          sourceAccount = sourceAccount, 
@@ -115,8 +119,8 @@ type OnlineBanking object {
 };
 
 public function main() {
-    AccountManagement actMgmt = new;
-    OnlineBanking olBank = new(actMgmt);
+    AccountManager actMgmr = new;
+    OnlineBanking olBank = new(actMgmr);
     error? err = olBank.transferMoney("AC1", "AC2", 500.0);
     if (err is error) {
         io:println("AC1->AC2 Transfer Error: ", err);
