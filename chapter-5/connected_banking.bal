@@ -27,7 +27,7 @@ public type AccountManager object {
     public function getAccountBalance(string accountNumber) 
                                       returns decimal|AccountMgtError {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             return result;
         } else {
             return error(INVALID_ACCOUNT_NUMBER, 
@@ -39,7 +39,7 @@ public type AccountManager object {
     public function debitAccount(string accountNumber, decimal amount) 
                                  returns AccountMgtError? {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             decimal balance = result - amount;
             if (balance < 0.0) {
                 return error(INSUFFICIENT_ACCOUNT_BALANCE, 
@@ -58,7 +58,7 @@ public type AccountManager object {
     public function creditAccount(string accountNumber, decimal amount) 
                                   returns AccountMgtError? {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             self.accounts[accountNumber] = result + amount;
         } else {
             return error(INVALID_ACCOUNT_NUMBER, 
@@ -101,14 +101,14 @@ type OnlineBanking object {
                                   returns OnlineBankingTransferError? {
         AccountMgtError? err = self.accountMgr.debitAccount(
                                   sourceAccount, amount);
-        if (err is error) {
+        if err is error {
             return error(OB_TRANSFER_ERROR, 
                          sourceAccount = sourceAccount, 
                          targetAccount = targetAccount, 
                          amount = amount, cause = err);
         }
         err = self.accountMgr.creditAccount(targetAccount, amount);
-        if (err is error) {
+        if err is error {
             return error(OB_TRANSFER_ERROR, 
                          sourceAccount = sourceAccount, 
                          targetAccount = targetAccount, 
@@ -122,13 +122,13 @@ public function main() {
     AccountManager actMgmr = new;
     OnlineBanking olBank = new(actMgmr);
     error? err = olBank.transferMoney("AC1", "AC2", 500.0);
-    if (err is error) {
+    if err is error {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
     io:println("AC1 Balance: ", olBank.lookupAccountBalance("AC1"));
     io:println("AC2 Balance: ", olBank.lookupAccountBalance("AC2"));
     err = olBank.transferMoney("AC1", "AC2", 1500.0);
-    if (err is error) {
+    if err is error {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
 }
