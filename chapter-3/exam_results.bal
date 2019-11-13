@@ -16,16 +16,14 @@ type ExamResult object {
     }
 
     public function average() returns int {
-        return (self.mathsScore + self.physicsScore + self.chemistryScore) / 3;
+        return (self.mathsScore + self.physicsScore + 
+                self.chemistryScore) / 3;
     }
 
 };
-
 
 public function main() returns error? {
     ExamResult result1 = new("sunil", 90, 85, 80);
     int avg = result1.average();
     io:println("Sunil's exam score average: ", avg);
 }
-
-
