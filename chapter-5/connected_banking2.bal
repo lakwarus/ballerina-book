@@ -66,18 +66,6 @@ public type AccountManager object {
 
 };
 
-type OnlineBankingTransferErrorDetail record {|
-    string message?;
-    AccountMgtError cause;
-    string sourceAccount;
-    string targetAccount;
-    decimal amount;
-|};
-
-const OB_TRANSFER_ERROR = "ONLINE_BANKING_TRANSFER_ERROR";
-
-type OnlineBankingTransferError error<OB_TRANSFER_ERROR,
-                                OnlineBankingTransferErrorDetail>;
 
 type OnlineBanking object {
 
@@ -88,44 +76,38 @@ type OnlineBanking object {
     }
 
     public function lookupAccountBalance(string accountNumber) 
-                                     returns decimal|AccountMgtError {
+                                returns decimal|AccountMgtError {
         return self.accountMgr.getAccountBalance(accountNumber);
     }
 
     public function transferMoney(string sourceAccount, 
                                   string targetAccount, 
                                   decimal amount) 
-                                  returns OnlineBankingTransferError? {
+                                  returns AccountMgtError? {
         AccountMgtError? err = self.accountMgr.debitAccount(
                                   sourceAccount, amount);
-        if err is error {
-            return error(OB_TRANSFER_ERROR, 
-                         sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, 
-                         amount = amount, cause = err);
+        if (err is error) {
+            return err;
         }
         err = self.accountMgr.creditAccount(targetAccount, amount);
-        if err is error {
-            return error(OB_TRANSFER_ERROR, 
-                         sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, 
-                         amount = amount, cause = err);
+        if (err is error) {
+            return err;
         }
     }
 
 };
 
 public function main() {
-    AccountManager actMgmr = new;
-    OnlineBanking olBank = new(actMgmr);
+    AccountManager am = new;
+    OnlineBanking olBank = new(am);
     error? err = olBank.transferMoney("AC1", "AC2", 500.0);
-    if err is error {
+    if (err is error) {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
     io:println("AC1 Balance: ", olBank.lookupAccountBalance("AC1"));
     io:println("AC2 Balance: ", olBank.lookupAccountBalance("AC2"));
     err = olBank.transferMoney("AC1", "AC2", 1500.0);
-    if err is error {
+    if (err is error) {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
 }

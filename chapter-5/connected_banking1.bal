@@ -66,66 +66,26 @@ public type AccountManager object {
 
 };
 
-type OnlineBankingTransferErrorDetail record {|
-    string message?;
-    AccountMgtError cause;
-    string sourceAccount;
-    string targetAccount;
-    decimal amount;
-|};
-
-const OB_TRANSFER_ERROR = "ONLINE_BANKING_TRANSFER_ERROR";
-
-type OnlineBankingTransferError error<OB_TRANSFER_ERROR,
-                                OnlineBankingTransferErrorDetail>;
-
-type OnlineBanking object {
-
-    private AccountManager accountMgr;
-
-    public function __init(AccountManager accountMgr) {
-        self.accountMgr = accountMgr;
-    }
-
-    public function lookupAccountBalance(string accountNumber) 
-                                     returns decimal|AccountMgtError {
-        return self.accountMgr.getAccountBalance(accountNumber);
-    }
-
-    public function transferMoney(string sourceAccount, 
-                                  string targetAccount, 
-                                  decimal amount) 
-                                  returns OnlineBankingTransferError? {
-        AccountMgtError? err = self.accountMgr.debitAccount(
-                                  sourceAccount, amount);
-        if err is error {
-            return error(OB_TRANSFER_ERROR, 
-                         sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, 
-                         amount = amount, cause = err);
-        }
-        err = self.accountMgr.creditAccount(targetAccount, amount);
-        if err is error {
-            return error(OB_TRANSFER_ERROR, 
-                         sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, 
-                         amount = amount, cause = err);
-        }
-    }
-
-};
-
 public function main() {
-    AccountManager actMgmr = new;
-    OnlineBanking olBank = new(actMgmr);
-    error? err = olBank.transferMoney("AC1", "AC2", 500.0);
-    if err is error {
-        io:println("AC1->AC2 Transfer Error: ", err);
+    AccountManager am = new;
+    decimal|error r1 = am.getAccountBalance("AC1");
+    decimal|error r2 = am.getAccountBalance("AC2");
+    decimal|error r3 = am.getAccountBalance("AC3");
+    io:println("AC1 Balance: ", r1);
+    io:println("AC2 Balance: ", r2);
+    io:println("AC3 Balance: ", r3);
+    error? err = am.debitAccount("AC1", 1000);
+    if (err is error) {
+        io:println("AC1 Debit Error: ", err);
     }
-    io:println("AC1 Balance: ", olBank.lookupAccountBalance("AC1"));
-    io:println("AC2 Balance: ", olBank.lookupAccountBalance("AC2"));
-    err = olBank.transferMoney("AC1", "AC2", 1500.0);
-    if err is error {
-        io:println("AC1->AC2 Transfer Error: ", err);
+    err = am.creditAccount("AC2", 1000);
+    if (err is error) {
+        io:println("AC2 Credit Error: ", err);
+    }
+    io:println("AC1 Balance: ", am.getAccountBalance("AC1"));
+    io:println("AC2 Balance: ",  am.getAccountBalance("AC2"));
+    err = am.debitAccount("AC1", 1000);
+    if (err is error) {
+        io:println("AC1 Debit Error: ", err);
     }
 }

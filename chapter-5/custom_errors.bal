@@ -7,14 +7,11 @@ type MyErrorDetail record {|
     string location;
 |};
 
-const MY_REASON1 = "MyReason1";
-const MY_REASON2 = "MyReason2";
+const MY_REASON1 = "MY_REASON1";
+const MY_REASON2 = "MY_REASON2";
 
-type MyErrorReason1 MY_REASON1;
-type MyErrorReason2 MY_REASON2;
-
-type MyError1 error<MyErrorReason1, MyErrorDetail>;
-type MyError2 error<MyErrorReason2>;
+type MyError1 error<MY_REASON1, MyErrorDetail>;
+type MyError2 error<MY_REASON2>;
 
 public function main() {
     string|error result = myErrorProneFunction();
