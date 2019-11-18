@@ -1,3 +1,7 @@
+# Calculates the factorial of the given number.
+# 
+# + n - The input number
+# + return - The factorial of the given number
 public function fact(int n) returns int {
     if (n == 1) {
         return 1;
@@ -6,6 +10,10 @@ public function fact(int n) returns int {
     }
 }
 
+# Sort the given integer array in ascending order.
+# 
+# + input - The input values to be sorted
+# + return - The sorted values of the input
 public function sort(int[] input) returns int[] {
     int i = 0;
     boolean swapped;

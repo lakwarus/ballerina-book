@@ -3,11 +3,22 @@ import ballerina/lang.'int as ints;
 
 public type Algorithm ALGO_FACT|ALGO_SORT;
 
+# This represents the decoded calculator request from a user.
+# 
+# + algorithm - This represents the algorithm that was chosen
+#               as an `Algorithm` type.
+# + data - The data is the input data provided by the user for 
+#          the given algorithm.
 public type Request record {
     Algorithm algorithm;
     int[] data;
 };
 
+# This parses the request received by a user.
+# 
+# + request - The input by the uer
+# + return - A decoded input as a `Request` value, or an `error`
+# 
 public function parseRequest(string request) returns Request|error {
     string trimReq = request.trim();
     if trimReq.startsWith("fact ") {
