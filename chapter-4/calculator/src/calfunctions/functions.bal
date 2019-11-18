@@ -3,7 +3,7 @@
 # + n - The input number
 # + return - The factorial of the given number
 public function fact(int n) returns int {
-    if (n == 1) {
+    if (n <= 1) {
         return 1;
     } else {
         return n * fact(n - 1);
