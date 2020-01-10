@@ -18,7 +18,7 @@ function perm(int n, int r) returns int {
 function fact(int n) returns int {
    int nf = 1;
    int i = n;
-   while (i > 0) {
+   while i > 0 {
        nf = nf * i;
        i = i - 1;
    }
