@@ -8,7 +8,7 @@ public function main() {
     int JUMP = 16;  // [0 0 0 1 0 0 0 0]
     int SHOOT = 32; // [0 0 1 0 0 0 0 0]
 
-    int event = UP | JUMP | SHOOT; // creating the event
+    int event = RIGHT | JUMP | SHOOT; // creating the event
     if ((event & UP) == UP) {
         io:println("UP");
     }
