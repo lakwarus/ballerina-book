@@ -7,27 +7,28 @@ type MyErrorDetail record {|
     string location;
 |};
 
-const MyErrorReason1 = "MyReason";
-const MyErrorReason2 = "MyReason";
+const MY_REASON1 = "MY_REASON1";
+const MY_REASON2 = "MY_REASON2";
 
-type MyError1 error<MyErrorReason1>;
-type MyError2 error<MyErrorReason2>;
+type MyError1 error<MY_REASON1, MyErrorDetail>;
+type MyError2 error<MY_REASON2>;
 
 public function main() {
     string|error result = myErrorProneFunction();
-    if (result is MyError1) {
+    if (result is string) {
+        io:println(result);
+    } else if (result is MyError1) {
         io:println("Error1: ", result);
-    } 
-    if (result is MyError2) {
+    } else if (result is MyError2) {
         io:println("Error2: ", result);
     }
 }
 
 function myErrorProneFunction() returns string|error {
     if (math:random() > 0.5) {
-        return error(MyErrorReason1, message = "invalid input",
+        return error(MY_REASON1, message = "invalid input",
                      location = "MyLocation");
     } else {
-        return error(MyErrorReason2, message = "invalid operation");
+        return error(MY_REASON2, message = "invalid operation");
     }
 }

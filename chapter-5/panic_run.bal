@@ -12,7 +12,7 @@ type MyError error<MyReason, MyErrorDetail>;
 
 public function main() {
     string|error res = trap myErrorProneFunction();
-    if (res is error) {
+    if res is error {
         io:println("Error: ", res);
     } else {
         io:println(res);

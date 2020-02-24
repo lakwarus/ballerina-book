@@ -17,14 +17,14 @@ type AccountMgtErrorDetail record {|
 type AccountMgtError error<AccountMgtErrorReason, 
                            AccountMgtErrorDetail>;
 
-public type AccountManagement object {
+public type AccountManager object {
 
     private map<decimal> accounts = { AC1: 1500.0, AC2: 2550.0 };
 
     public function getAccountBalance(string accountNumber) 
-                                      returns decimal|error {
+                                      returns decimal|AccountMgtError {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             return result;
         } else {
             return error(INVALID_ACCOUNT_NUMBER, 
@@ -36,7 +36,7 @@ public type AccountManagement object {
     public function debitAccount(string accountNumber, decimal amount) 
                                  returns AccountMgtError? {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             decimal balance = result - amount;
             if (balance < 0.0) {
                 return error(INSUFFICIENT_ACCOUNT_BALANCE, 
@@ -55,7 +55,7 @@ public type AccountManagement object {
     public function creditAccount(string accountNumber, decimal amount) 
                                   returns AccountMgtError? {
         decimal? result = self.accounts[accountNumber];
-        if (result is decimal) {
+        if result is decimal {
             self.accounts[accountNumber] = result + amount;
         } else {
             return error(INVALID_ACCOUNT_NUMBER, 
@@ -77,52 +77,55 @@ type OnlineBankingTransferErrorDetail record {|
 const OB_TRANSFER_ERROR = "ONLINE_BANKING_TRANSFER_ERROR";
 
 type OnlineBankingTransferError error<OB_TRANSFER_ERROR,
-                                      OnlineBankingTransferErrorDetail>;
+                                OnlineBankingTransferErrorDetail>;
 
 type OnlineBanking object {
 
-    private AccountManagement accountMgt;
+    private AccountManager accountMgr;
 
-    public function __init(AccountManagement accountMgt) {
-        self.accountMgt = accountMgt;
+    public function __init(AccountManager accountMgr) {
+        self.accountMgr = accountMgr;
     }
 
     public function lookupAccountBalance(string accountNumber) 
-                                         returns decimal|error {
-        return self.accountMgt.getAccountBalance(accountNumber);
+                                     returns decimal|AccountMgtError {
+        return self.accountMgr.getAccountBalance(accountNumber);
     }
 
     public function transferMoney(string sourceAccount, 
                                   string targetAccount, 
-                                  decimal amount) returns error? {
-        AccountMgtError? err = self.accountMgt.debitAccount(
+                                  decimal amount) 
+                                  returns OnlineBankingTransferError? {
+        AccountMgtError? err = self.accountMgr.debitAccount(
                                   sourceAccount, amount);
-        if (err is error) {
-            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, amount = amount,
-                         cause = err);
+        if err is error {
+            return error(OB_TRANSFER_ERROR, 
+                         sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, 
+                         amount = amount, cause = err);
         }
-        err = self.accountMgt.creditAccount(targetAccount, amount);
-        if (err is error) {
-            return error(OB_TRANSFER_ERROR, sourceAccount = sourceAccount, 
-                         targetAccount = targetAccount, amount = amount,
-                         cause = err);
+        err = self.accountMgr.creditAccount(targetAccount, amount);
+        if err is error {
+            return error(OB_TRANSFER_ERROR, 
+                         sourceAccount = sourceAccount, 
+                         targetAccount = targetAccount, 
+                         amount = amount, cause = err);
         }
     }
 
 };
 
 public function main() {
-    AccountManagement actMgmt = new;
-    OnlineBanking olBank = new(actMgmt);
+    AccountManager actMgmr = new;
+    OnlineBanking olBank = new(actMgmr);
     error? err = olBank.transferMoney("AC1", "AC2", 500.0);
-    if (err is error) {
+    if err is error {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
     io:println("AC1 Balance: ", olBank.lookupAccountBalance("AC1"));
     io:println("AC2 Balance: ", olBank.lookupAccountBalance("AC2"));
     err = olBank.transferMoney("AC1", "AC2", 1500.0);
-    if (err is error) {
+    if err is error {
         io:println("AC1->AC2 Transfer Error: ", err);
     }
 }
